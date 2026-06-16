@@ -1,6 +1,6 @@
 package pt.ipleiria.worldcup.model;
 
-public class Staff {
+public class Staff implements java.io.Serializable{
     private static final long serialVersionUID = 1L;
 
     private String nome;

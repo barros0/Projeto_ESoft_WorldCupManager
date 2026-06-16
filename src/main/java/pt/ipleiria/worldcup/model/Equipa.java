@@ -5,7 +5,7 @@ import pt.ipleiria.worldcup.model.Enums.Confederacao;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Equipa {
+public class Equipa implements java.io.Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -74,4 +74,11 @@ public class Equipa {
     public List<Staff> getStaff() {
         return staff;
     }
+
+    @Override
+    public String toString(){
+        return pais + " (" + sigla + ")";
+    }
+
+
 }

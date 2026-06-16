@@ -3,7 +3,7 @@ package pt.ipleiria.worldcup.model;
 import pt.ipleiria.worldcup.model.Enums.EstadoJogador;
 import java.time.LocalDate;
 
-public class Jogador {
+public class Jogador implements java.io.Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -56,5 +56,9 @@ public class Jogador {
         this.estado = estado;
     }
 
+    @Override
+    public String toString(){
+        return nome + " (" + numeroCamisola + ")";
+    }
 
 }
