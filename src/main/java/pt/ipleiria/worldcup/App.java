@@ -6,7 +6,10 @@ import pt.ipleiria.worldcup.ui.common.Ui;
 import javax.swing.*;
 import java.awt.*;
 
-
+/**
+ * WorldCup Manager — Sistema de gestão do Campeonato do Mundo de Futebol.
+ * Engenharia de Software 2025/26 — Politécnico de Leiria.
+ */
 public class App {
     public static void main(String[] args) {
         instalarLookAndFeel();
@@ -16,14 +19,14 @@ public class App {
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 
-
+    /** FlatLaf (flat design moderno); fallback para Nimbus se indisponível. */
     private static void instalarLookAndFeel() {
         try {
             // Carregado por reflexão para o projeto compilar mesmo sem a dependência
             Class<?> flat = Class.forName("com.formdev.flatlaf.FlatLightLaf");
             UIManager.setLookAndFeel((LookAndFeel) flat.getDeclaredConstructor().newInstance());
 
-
+            // Tema moderno: cantos arredondados, foco e seleção na cor de destaque
             UIManager.put("Component.arc", 12);
             UIManager.put("Button.arc", 14);
             UIManager.put("TextComponent.arc", 12);
