@@ -19,6 +19,6 @@ public class Substancia implements java.io.Serializable{
     public String toString(){
         return nome;
     }
-q
+
 
 }
