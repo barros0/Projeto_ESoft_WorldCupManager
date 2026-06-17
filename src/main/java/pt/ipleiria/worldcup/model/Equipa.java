@@ -18,6 +18,13 @@ public class Equipa implements java.io.Serializable{
     private final List<Jogador> jogadores = new ArrayList<>();
     private final List<Staff> staff = new ArrayList<>();
 
+    public Equipa(String pais, String bandeira, String sigla, Confederacao confederacao, int pote) {
+        this.pais = pais;
+        this.bandeira = bandeira;
+        this.sigla = sigla;
+        this.confederacao = confederacao;
+        this.pote = pote;
+    }
 
     public String getPais() {
         return pais;
