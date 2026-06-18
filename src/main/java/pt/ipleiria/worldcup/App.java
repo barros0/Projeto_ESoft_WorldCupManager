@@ -35,8 +35,8 @@ public class App {
             UIManager.put("Component.innerFocusWidth", 1);
             UIManager.put("Component.accentColor", Ui.PRIMARY);
             UIManager.put("Component.focusColor", Ui.PRIMARY);
-            UIManager.put("Button.default.background", Ui.PRIMARY);
-            UIManager.put("Button.default.foreground", Color.WHITE);
+            // Button.default não é sobreposto globalmente para não afetar JOptionPane
+            UIManager.put("OptionPane.buttonFont", new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 13));
             UIManager.put("TabbedPane.selectedBackground", Color.WHITE);
             UIManager.put("TabbedPane.underlineColor", Ui.PRIMARY);
             UIManager.put("TabbedPane.inactiveUnderlineColor", Ui.PRIMARY_SOFT);
