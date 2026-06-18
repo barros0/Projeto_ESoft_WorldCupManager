@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Ver testes de Doping com filtros: equipa, resultado, jogador, data, castigo (Figura 17). */
 public class VerTestesPanel extends JPanel implements DopingPanel.Atualizavel {
 
     private final DataStore ds = DataStore.getInstance();
@@ -49,7 +50,7 @@ public class VerTestesPanel extends JPanel implements DopingPanel.Atualizavel {
 
         JPanel centro = new JPanel(new BorderLayout());
         centro.setOpaque(false);
-        centro.add(filtros, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(filtros), BorderLayout.NORTH);
         centro.add(Ui.table(tabela), BorderLayout.CENTER);
         add(centro, BorderLayout.CENTER);
         atualizar();

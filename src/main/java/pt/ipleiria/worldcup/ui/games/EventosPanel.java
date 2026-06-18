@@ -46,7 +46,7 @@ public class EventosPanel extends JPanel implements JogosPanel.Atualizavel {
         cmbTipo.addActionListener(e -> tipoMudou());
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(form, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(form), BorderLayout.NORTH);
         centro.add(Ui.table(new JTable(model)), BorderLayout.CENTER);
         add(centro, BorderLayout.CENTER);
         atualizar();

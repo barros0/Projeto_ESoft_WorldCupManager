@@ -55,7 +55,7 @@ public class EstadiosPanel extends JPanel implements JogosPanel.Atualizavel {
         sul.add(btnEditarFoto);
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(form, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(form), BorderLayout.NORTH);
         JScrollPane sp = Ui.table(tabela);
         tabela.setRowHeight(46);
         tabela.getColumnModel().getColumn(0).setMaxWidth(90);

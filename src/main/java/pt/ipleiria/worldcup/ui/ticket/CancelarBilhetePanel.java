@@ -43,7 +43,7 @@ public class CancelarBilhetePanel extends JPanel implements BilheteiraPanel.Atua
         botoes.add(btnConfirmar);
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(topo, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(topo), BorderLayout.NORTH);
         centro.add(Ui.table(tabela), BorderLayout.CENTER);
         centro.add(botoes, BorderLayout.SOUTH);
         add(centro, BorderLayout.CENTER);

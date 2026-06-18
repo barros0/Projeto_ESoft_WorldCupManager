@@ -74,7 +74,7 @@ public class RegistoEquipasPanel extends JPanel implements JogosPanel.Atualizave
         sul.add(lblContagem);
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(form, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(form), BorderLayout.NORTH);
         JScrollPane sp = Ui.table(tabela);
         tabela.setRowHeight(30); // espaço para a miniatura
         tabela.getColumnModel().getColumn(0).setMaxWidth(70);

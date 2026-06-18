@@ -58,7 +58,7 @@ public class AlojamentoPanel extends JPanel implements EquipasPanel.Atualizavel 
         acoes.add(btnApagar);
         meio.add(acoes, BorderLayout.SOUTH);
 
-        add(topo, BorderLayout.NORTH);
+        add(Ui.formScroll(topo), BorderLayout.NORTH);
         add(meio, BorderLayout.CENTER);
         atualizar();
     }

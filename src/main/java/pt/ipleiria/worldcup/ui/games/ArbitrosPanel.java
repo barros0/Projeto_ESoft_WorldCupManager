@@ -35,7 +35,7 @@ public class ArbitrosPanel extends JPanel implements JogosPanel.Atualizavel {
         sul.add(btnRem);
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(form, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(form), BorderLayout.NORTH);
         centro.add(Ui.table(tabela), BorderLayout.CENTER);
         centro.add(sul, BorderLayout.SOUTH);
         add(centro, BorderLayout.CENTER);

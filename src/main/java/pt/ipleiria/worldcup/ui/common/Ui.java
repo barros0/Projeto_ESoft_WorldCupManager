@@ -63,6 +63,21 @@ public final class Ui {
         return p;
     }
 
+    /**
+     * Envolve um painel num JScrollPane horizontal (nunca faz scroll vertical)
+     * com altura mínima garantida — evita que campos/botões fiquem fora do ecrã.
+     */
+    public static JScrollPane formScroll(JPanel formPanel) {
+        formPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, formPanel.getPreferredSize().height + 20));
+        JScrollPane sp = new JScrollPane(formPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sp.setBorder(BorderFactory.createEmptyBorder());
+        sp.setMinimumSize(new Dimension(0, formPanel.getPreferredSize().height + 24));
+        sp.setPreferredSize(new Dimension(Integer.MAX_VALUE, formPanel.getPreferredSize().height + 24));
+        return sp;
+    }
+
     public static JPanel form(Component... pairs) {
         JPanel p = new JPanel(new GridBagLayout());
         p.setOpaque(false);

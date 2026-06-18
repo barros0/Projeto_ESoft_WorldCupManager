@@ -58,7 +58,7 @@ public class JogadoresPanel extends JPanel implements EquipasPanel.Atualizavel {
         filtros.add(new JLabel("Equipa:"));
         filtros.add(filtroEquipa);
         filtroEquipa.addActionListener(e -> refrescarTabela());
-        meio.add(filtros, BorderLayout.NORTH);
+        meio.add(Ui.formScroll(filtros), BorderLayout.NORTH);
         meio.add(Ui.table(tabela), BorderLayout.CENTER);
 
         JPanel acoes = new JPanel(new FlowLayout(FlowLayout.LEFT));

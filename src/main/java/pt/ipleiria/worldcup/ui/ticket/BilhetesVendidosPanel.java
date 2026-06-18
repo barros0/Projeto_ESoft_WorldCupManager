@@ -34,7 +34,7 @@ public class BilhetesVendidosPanel extends JPanel implements BilheteiraPanel.Atu
         cmbJogo.addActionListener(e -> refrescar());
 
         JPanel centro = new JPanel(new BorderLayout());
-        centro.add(filtros, BorderLayout.NORTH);
+        centro.add(Ui.formScroll(filtros), BorderLayout.NORTH);
         centro.add(Ui.table(new JTable(model)), BorderLayout.CENTER);
         add(centro, BorderLayout.CENTER);
         atualizar();
