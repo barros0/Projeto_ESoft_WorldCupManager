@@ -3,6 +3,7 @@ package pt.ipleiria.worldcup.ui.doping;
 import pt.ipleiria.worldcup.data.DataStore;
 import pt.ipleiria.worldcup.model.Enums.ResultadoTeste;
 import pt.ipleiria.worldcup.model.Equipa;
+import pt.ipleiria.worldcup.model.Jogo;
 import pt.ipleiria.worldcup.model.Jogador;
 import pt.ipleiria.worldcup.model.Substancia;
 import pt.ipleiria.worldcup.model.TesteDoping;
@@ -14,37 +15,45 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Fazer teste de Doping — máx. 2 por jogo, data preenchida automaticamente pelo jogo. */
 public class FazerTestePanel extends JPanel implements DopingPanel.Atualizavel {
 
     private final DataStore ds = DataStore.getInstance();
     private final DopingService service = new DopingService();
 
+    private final JComboBox<Object> jogo = new JComboBox<>();   // selecionar o jogo
+    private final JTextField data = new JTextField(10);         // preenchido automaticamente
     private final JComboBox<Jogador> jogador = new JComboBox<>();
-    private final JTextField data = new JTextField(10);
     private final JComboBox<ResultadoTeste> resultado = new JComboBox<>(ResultadoTeste.values());
-    private final JComboBox<Substancia> substancia = new JComboBox<>(); // listagem pré-carregada
+    private final JComboBox<Substancia> substancia = new JComboBox<>();
+    private final JLabel lblTestesFeitos = new JLabel("Testes neste jogo: 0 / 2");
 
     public FazerTestePanel() {
         setLayout(new BorderLayout());
         setBackground(Ui.LIGHT);
-
         add(Ui.title("Fazer Teste de Doping"), BorderLayout.NORTH);
-        data.setToolTipText("DD-MM-AAAA");
+        data.setEditable(false);
+        data.setBackground(new Color(240, 242, 245));
+        data.setToolTipText("Preenchido automaticamente com a data do jogo");
 
-        // A substância só fica ativa quando o resultado é Positivo
+        // ao selecionar jogo → preenche data e filtra jogadores das 2 equipas
+        jogo.addActionListener(e -> aoSelecionarJogo());
+        // substância só ativa se positivo
         resultado.addActionListener(e ->
                 substancia.setEnabled(resultado.getSelectedItem() == ResultadoTeste.POSITIVO));
         substancia.setEnabled(false);
 
-        JButton registar = new JButton("Registar Teste");
-        registar.addActionListener(e -> registar());
+        JButton btnRegistar = new JButton("Registar Teste");
+        btnRegistar.addActionListener(e -> registar());
 
         JPanel form = Ui.form(
-                new JLabel("Jogador"), jogador,
-                new JLabel("Data do teste (DD-MM-AAAA)"), data,
-                new JLabel("Resultado"), resultado,
-                new JLabel("Substância (se positivo)"), substancia,
-                new JLabel(), registar);
+                new JLabel("Jogo:"), jogo,
+                new JLabel("Data do teste:"), data,
+                new JLabel(), lblTestesFeitos,
+                new JLabel("Jogador:"), jogador,
+                new JLabel("Resultado:"), resultado,
+                new JLabel("Substância (se positivo):"), substancia,
+                new JLabel(), btnRegistar);
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setOpaque(false);
         wrap.add(form, BorderLayout.NORTH);
@@ -52,14 +61,42 @@ public class FazerTestePanel extends JPanel implements DopingPanel.Atualizavel {
         atualizar();
     }
 
+    private void aoSelecionarJogo() {
+        Object sel = jogo.getSelectedItem();
+        if (!(sel instanceof Jogo j)) {
+            data.setText("");
+            lblTestesFeitos.setText("Testes neste jogo: — / 2");
+            jogador.setModel(new DefaultComboBoxModel<>());
+            return;
+        }
+        // data automática
+        data.setText(j.getData() != null ? Ui.fmt(j.getData()) : "");
+
+        // contar testes já feitos para esta data
+        long feitos = j.getData() == null ? 0 : ds.getTestes().stream()
+                .filter(t -> t.getData().equals(j.getData())).count();
+        lblTestesFeitos.setText("Testes neste jogo: " + feitos + " / 2"
+                + (feitos >= 2 ? "  ⚠ limite atingido" : ""));
+        lblTestesFeitos.setForeground(feitos >= 2 ? Color.RED : Ui.MUTED);
+
+        // filtrar jogadores das duas equipas do jogo
+        List<Jogador> js = new ArrayList<>();
+        if (j.getEquipa1() != null) js.addAll(j.getEquipa1().getJogadores());
+        if (j.getEquipa2() != null) js.addAll(j.getEquipa2().getJogadores());
+        jogador.setModel(new DefaultComboBoxModel<>(js.toArray(new Jogador[0])));
+    }
+
     private void registar() {
         try {
-            Jogador j = (Jogador) jogador.getSelectedItem();
-            if (j == null) throw new IllegalArgumentException("Selecione o jogador testado.");
+            Object sel = jogo.getSelectedItem();
+            if (!(sel instanceof Jogo j)) throw new IllegalArgumentException("Selecione o jogo.");
+            if (j.getData() == null) throw new IllegalArgumentException("O jogo selecionado não tem data definida.");
+            Jogador jog = (Jogador) jogador.getSelectedItem();
+            if (jog == null) throw new IllegalArgumentException("Selecione o jogador testado.");
             ResultadoTeste r = (ResultadoTeste) resultado.getSelectedItem();
             Substancia s = r == ResultadoTeste.POSITIVO ? (Substancia) substancia.getSelectedItem() : null;
-            TesteDoping t = service.registarTeste(j, Ui.parseDate(data.getText(), "Data do teste"), r, s);
-            data.setText("");
+            TesteDoping t = service.registarTeste(jog, j.getData(), r, s);
+            aoSelecionarJogo(); // atualiza contador
             String msg = "Teste registado com sucesso.";
             if (!"-".equals(t.getCastigoAplicado()))
                 msg += "\nCastigo aplicado automaticamente: " + t.getCastigoAplicado();
@@ -68,11 +105,13 @@ public class FazerTestePanel extends JPanel implements DopingPanel.Atualizavel {
     }
 
     @Override public void atualizar() {
-        List<Jogador> js = new ArrayList<>();
-        for (Equipa e : ds.getEquipas()) js.addAll(e.getJogadores());
-        Jogador sel = (Jogador) jogador.getSelectedItem();
-        jogador.setModel(new DefaultComboBoxModel<>(js.toArray(new Jogador[0])));
-        if (sel != null && js.contains(sel)) jogador.setSelectedItem(sel);
+        // combo de jogos: opção vazia + todos os jogos realizados
+        DefaultComboBoxModel<Object> mj = new DefaultComboBoxModel<>();
+        mj.addElement("— Selecione o jogo —");
+        ds.getJogos().stream().filter(Jogo::isRealizado).forEach(mj::addElement);
+        jogo.setModel(mj);
         substancia.setModel(new DefaultComboBoxModel<>(ds.getSubstancias().toArray(new Substancia[0])));
+        data.setText("");
+        lblTestesFeitos.setText("Testes neste jogo: — / 2");
     }
 }

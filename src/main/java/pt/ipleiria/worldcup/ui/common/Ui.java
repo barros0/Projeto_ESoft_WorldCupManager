@@ -155,7 +155,12 @@ public final class Ui {
     }
 
     public static java.time.LocalDate parseDate(String s, String campo) {
-        try { return java.time.LocalDate.parse(s.trim().replace('/', '-'), DATA_EU); }
+        try {
+            java.time.LocalDate d = java.time.LocalDate.parse(s.trim().replace('/', '-'), DATA_EU);
+            if (d.getYear() < 1900 || d.getYear() > 2100)
+                throw new IllegalArgumentException("Campo \"" + campo + "\" inválido: ano fora do intervalo (1900-2100).");
+            return d;
+        } catch (IllegalArgumentException ex) { throw ex; }
         catch (Exception e) { throw new IllegalArgumentException("Campo \"" + campo + "\" inválido: use o formato DD-MM-AAAA."); }
     }
 
