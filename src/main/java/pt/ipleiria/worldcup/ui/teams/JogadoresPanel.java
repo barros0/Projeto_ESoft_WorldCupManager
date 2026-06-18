@@ -21,7 +21,6 @@ public class JogadoresPanel extends JPanel implements EquipasPanel.Atualizavel {
 
     private final JTextField nome = new JTextField(15);
     private final JTextField nascimento = new JTextField(10);
-    private final JTextField nacionalidade = new JTextField(12);
     private final JComboBox<String> posicao =
             new JComboBox<>(new String[]{"Guarda-Redes", "Defesa", "Médio", "Avançado"});
     private final JComboBox<Equipa> equipa = new JComboBox<>();
@@ -46,7 +45,6 @@ public class JogadoresPanel extends JPanel implements EquipasPanel.Atualizavel {
         topo.add(Ui.form(
                 new JLabel("Nome"), nome,
                 new JLabel("Data de nascimento (DD-MM-AAAA)"), nascimento,
-                new JLabel("Nacionalidade"), nacionalidade,
                 new JLabel("Posição"), posicao,
                 new JLabel("Seleção que representa"), equipa,
                 new JLabel("Nr. camisola"), camisola,
@@ -86,13 +84,11 @@ public class JogadoresPanel extends JPanel implements EquipasPanel.Atualizavel {
             Equipa eq = (Equipa) equipa.getSelectedItem();
             if (eq == null) throw new IllegalArgumentException("Selecione a equipa.");
             if (nome.getText().isBlank()) throw new IllegalArgumentException("Indique o nome do jogador.");
-            if (nacionalidade.getText().isBlank()) throw new IllegalArgumentException("Indique a nacionalidade.");
             service.adicionarJogador(eq, nome.getText().trim(),
                     Ui.parseDate(nascimento.getText(), "Data de nascimento"),
-                    nacionalidade.getText().trim(),
                     (String) posicao.getSelectedItem(),
                     Ui.parseInt(camisola.getText(), "Nr. camisola"));
-            nome.setText(""); nascimento.setText(""); nacionalidade.setText(""); camisola.setText("");
+            nome.setText(""); nascimento.setText(""); camisola.setText("");
             refrescarTabela();
             Ui.info(this, "Jogador adicionado com sucesso.");
         } catch (RuntimeException ex) { Ui.erro(this, ex.getMessage()); }

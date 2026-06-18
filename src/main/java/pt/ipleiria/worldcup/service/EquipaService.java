@@ -10,10 +10,10 @@ public class EquipaService {
     private final DataStore ds = DataStore.getInstance();
 
     public void adicionarJogador(Equipa equipa, String nome, LocalDate nascimento,
-                                 String nacionalidade, String posicao, int camisola) {
+                                 String posicao, int camisola) {
         boolean repetida = equipa.getJogadores().stream().anyMatch(j -> j.getNumeroCamisola() == camisola);
         if (repetida) throw new IllegalStateException("O nº de camisola " + camisola + " já está em uso nessa equipa.");
-        equipa.getJogadores().add(new Jogador(nome, nascimento, nacionalidade, posicao, camisola, equipa));
+        equipa.getJogadores().add(new Jogador(nome, nascimento, posicao, camisola, equipa));
     }
 
     public void removerJogador(Jogador j) {
