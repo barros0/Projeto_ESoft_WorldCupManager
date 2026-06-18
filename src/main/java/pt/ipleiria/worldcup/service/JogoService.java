@@ -48,8 +48,13 @@ public class JogoService {
     }
 
     /** Regista um evento; aplica suspensão automática (2 amarelos no jogo / vermelho direto). */
-    public void registarEvento(Jogo j, TipoEvento tipo, Equipa equipa, Jogador jogador, int minuto) {
-        j.getEventos().add(new EventoJogo(tipo, equipa, jogador, minuto));
+    public void registarEvento(Jogo j, TipoEvento tipo, Equipa equipa,
+                               Jogador jogador, Jogador jogadorEntra, int minuto) {
+        if (tipo == TipoEvento.SUBSTITUICAO && jogadorEntra == null)
+            throw new IllegalArgumentException("Indique o jogador que entra na substituição.");
+        if (tipo == TipoEvento.SUBSTITUICAO && jogador == jogadorEntra)
+            throw new IllegalArgumentException("O jogador que sai e o que entra não podem ser o mesmo.");
+        j.getEventos().add(new EventoJogo(tipo, equipa, jogador, jogadorEntra, minuto));
         if (jogador == null) return;
         if (tipo == TipoEvento.CARTAO_VERMELHO) {
             jogador.setEstado(EstadoJogador.SUSPENSO_JOGO);
@@ -58,6 +63,11 @@ public class JogoService {
                     .filter(e -> e.getJogador() == jogador && e.getTipo() == TipoEvento.CARTAO_AMARELO).count();
             if (amarelos >= 2) jogador.setEstado(EstadoJogador.SUSPENSO_JOGO);
         }
+    }
+
+    /** Sobrecarga sem jogadorEntra para eventos que não são substituições. */
+    public void registarEvento(Jogo j, TipoEvento tipo, Equipa equipa, Jogador jogador, int minuto) {
+        registarEvento(j, tipo, equipa, jogador, null, minuto);
     }
 
     /** Atribui equipa de arbitragem (5 árbitros, sem repetidos, nacionalidade != equipas). */
