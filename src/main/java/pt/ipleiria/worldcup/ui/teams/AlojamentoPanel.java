@@ -8,6 +8,8 @@ import pt.ipleiria.worldcup.model.Jogo;
 import pt.ipleiria.worldcup.service.EquipaService;
 import pt.ipleiria.worldcup.ui.common.Ui;
 
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -61,6 +63,17 @@ public class AlojamentoPanel extends JPanel implements EquipasPanel.Atualizavel 
         atualizar();
     }
 
+    private void filtrarJogosPorEquipa() {
+        Equipa eq = (Equipa) equipa.getSelectedItem();
+        Jogo sel = (Jogo) jogo.getSelectedItem();
+        List<Jogo> filtrados = eq == null ? ds.getJogos()
+                : ds.getJogos().stream()
+                    .filter(j -> j.getEquipa1() == eq || j.getEquipa2() == eq)
+                    .toList();
+        jogo.setModel(new DefaultComboBoxModel<>(filtrados.toArray(new Jogo[0])));
+        if (sel != null && filtrados.contains(sel)) jogo.setSelectedItem(sel);
+    }
+
     private void confirmar() {
         try {
             Equipa eq = (Equipa) equipa.getSelectedItem();
@@ -83,6 +96,7 @@ public class AlojamentoPanel extends JPanel implements EquipasPanel.Atualizavel 
 
     @Override public void atualizar() {
         equipa.setModel(new DefaultComboBoxModel<>(ds.getEquipas().toArray(new Equipa[0])));
+        equipa.addActionListener(e -> filtrarJogosPorEquipa());
         jogo.setModel(new DefaultComboBoxModel<>(ds.getJogos().toArray(new Jogo[0])));
         hotel.setModel(new DefaultComboBoxModel<>(ds.getHoteis().toArray(new Hotel[0])));
         refrescarTabela();
