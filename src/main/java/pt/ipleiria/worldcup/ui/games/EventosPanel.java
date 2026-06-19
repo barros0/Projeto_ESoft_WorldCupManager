@@ -20,11 +20,12 @@ public class EventosPanel extends JPanel implements JogosPanel.Atualizavel {
     private final JSpinner spnMinuto = new JSpinner(new SpinnerNumberModel(1, 1, 130, 1));
 
     // campos exclusivos da substituição
+    private final JLabel lblJogador = new JLabel("Jogador:");
     private final JLabel lblEntra = new JLabel("Jogador que entra:");
     private final JComboBox<Jogador> cmbJogadorEntra = new JComboBox<>();
 
     private final DefaultTableModel model =
-            Ui.model("Min.", "Tipo", "Jogador sai / marca", "Jogador entra", "Equipa");
+            Ui.model("Min.", "Tipo", "Jogador", "Entra (substituição)", "Equipa");
 
     public EventosPanel() {
         setLayout(new BorderLayout());
@@ -34,7 +35,7 @@ public class EventosPanel extends JPanel implements JogosPanel.Atualizavel {
         form.add(new JLabel("Jogo:"));    form.add(cmbJogo);
         form.add(new JLabel("Tipo:"));    form.add(cmbTipo);
         form.add(new JLabel("Equipa:")); form.add(cmbEquipa);
-        form.add(new JLabel("Jogador que sai / marca:")); form.add(cmbJogador);
+        form.add(lblJogador); form.add(cmbJogador);
         form.add(lblEntra); form.add(cmbJogadorEntra);
         form.add(new JLabel("Minuto:")); form.add(spnMinuto);
         JButton btnAdd = new JButton("Adicionar evento");
@@ -54,9 +55,19 @@ public class EventosPanel extends JPanel implements JogosPanel.Atualizavel {
 
     /** Mostra/oculta o combo "Jogador que entra" conforme o tipo selecionado. */
     private void tipoMudou() {
-        boolean isSub = cmbTipo.getSelectedItem() == TipoEvento.SUBSTITUICAO;
+        TipoEvento tipo = (TipoEvento) cmbTipo.getSelectedItem();
+        boolean isSub = tipo == TipoEvento.SUBSTITUICAO;
         lblEntra.setVisible(isSub);
         cmbJogadorEntra.setVisible(isSub);
+
+        // o label do jogador principal muda de acordo com o tipo de evento
+        lblJogador.setText(switch (tipo) {
+            case GOLO -> "Jogador que marca:";
+            case ASSISTENCIA -> "Jogador que assiste:";
+            case CARTAO_AMARELO, CARTAO_VERMELHO -> "Jogador advertido:";
+            case SUBSTITUICAO -> "Jogador que sai:";
+        });
+
         // repreencher com jogadores da mesma equipa
         if (isSub) equipaMudou();
     }
@@ -104,13 +115,22 @@ public class EventosPanel extends JPanel implements JogosPanel.Atualizavel {
         model.setRowCount(0);
         Jogo j = (Jogo) cmbJogo.getSelectedItem();
         if (j == null) return;
-        for (EventoJogo e : j.getEventos())
+        for (EventoJogo e : j.getEventos()) {
+            String nomeJogador = e.getJogador() == null ? "—" : e.getJogador().getNome();
+            // o significado do jogador principal depende do tipo de evento
+            String papel = switch (e.getTipo()) {
+                case GOLO -> "marca: ";
+                case ASSISTENCIA -> "assiste: ";
+                case CARTAO_AMARELO, CARTAO_VERMELHO -> "advertido: ";
+                case SUBSTITUICAO -> "sai: ";
+            };
             model.addRow(new Object[]{
                     e.getMinuto() + "'",
                     e.getTipo(),
-                    e.getJogador() == null ? "—" : e.getJogador().getNome(),
-                    e.getJogadorEntra() == null ? "—" : e.getJogadorEntra().getNome(),
+                    papel + nomeJogador,
+                    e.getJogadorEntra() == null ? "—" : "entra: " + e.getJogadorEntra().getNome(),
                     e.getEquipa() == null ? "—" : e.getEquipa().getPais()});
+        }
     }
 
     @Override public void atualizar() {
