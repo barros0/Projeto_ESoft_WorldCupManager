@@ -4,7 +4,3 @@
 
 # Maven
 target/
-
-# Dados da aplicação
-dados/
-bilhetes/
