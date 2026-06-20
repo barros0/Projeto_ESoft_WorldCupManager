@@ -111,18 +111,22 @@ public class AlojamentoPanel extends JPanel implements EquipasPanel.Atualizavel 
     private void editar() {
         Alojamento a = selecionado();
         if (a == null) return;
-        JComboBox<Jogo> fJogo = new JComboBox<>(ds.getJogos().toArray(new Jogo[0]));
+        Equipa eq = a.getEquipa();
+        List<Jogo> jogosDaEquipa = ds.getJogos().stream()
+                .filter(j -> j.getEquipa1() == eq || j.getEquipa2() == eq)
+                .toList();
+        JComboBox<Jogo> fJogo = new JComboBox<>(jogosDaEquipa.toArray(new Jogo[0]));
         fJogo.setSelectedItem(a.getJogo());
         JComboBox<Hotel> fHotel = new JComboBox<>(ds.getHoteis().toArray(new Hotel[0]));
         fHotel.setSelectedItem(a.getHotel());
         JPanel p = Ui.form(new JLabel("Jogo"), fJogo, new JLabel("Hotel"), fHotel);
         if (JOptionPane.showConfirmDialog(this, p,
-                "Editar Alojamento — " + a.getEquipa().getPais(),
+                "Editar Alojamento — " + eq.getPais(),
                 JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) return;
         try {
             Hotel novo = (Hotel) fHotel.getSelectedItem();
             // mantém a regra: confirmar se o hotel novo já tem outra equipa
-            if (novo != a.getHotel() && service.hotelOcupado(novo, a.getEquipa())
+            if (novo != a.getHotel() && service.hotelOcupado(novo, eq)
                     && !Ui.confirmar(this, "Já existe outra equipa alojada no hotel \""
                     + novo.getNome() + "\".\nDeseja continuar?")) return;
             service.editarAlojamento(a, (Jogo) fJogo.getSelectedItem(), novo);

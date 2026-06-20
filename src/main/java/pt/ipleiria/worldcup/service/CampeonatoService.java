@@ -163,6 +163,27 @@ public class CampeonatoService {
         }
         ds.getJogos().addAll(novos);
         c.setCalendarioGerado(true);
+        criarPlaceholdersEliminatorias(c);
+    }
+
+    /**
+     * Cria os jogos vazios (sem equipas atribuídas) de todas as fases eliminatórias,
+     * na quantidade correta consoante o número de apurados. À medida que os resultados
+     * da fase de grupos / anterior são registados, os vencedores preenchem estas vagas
+     * automaticamente (ver JogoService.avancarVencedor).
+     */
+    private void criarPlaceholdersEliminatorias(Campeonato c) {
+        for (Fase fase : c.getFasesEliminatorias()) {
+            int nJogos = switch (fase) {
+                case OITAVOS -> 8;
+                case QUARTOS -> c.getEquipasApuradas() == 16 ? 4 : 4; // 4 grupos: quartos é a 1ª fase eliminatória
+                case MEIAS -> 2;
+                case FINAL -> 1;
+                default -> 0;
+            };
+            for (int i = 0; i < nJogos; i++)
+                ds.getJogos().add(new Jogo(null, null, null, null, null, fase, 0));
+        }
     }
 
     /** Valida ajuste manual de data/estádio: bloqueia conflitos de estádio no mesmo dia. */
@@ -180,9 +201,28 @@ public class CampeonatoService {
     public void criarJogoEliminatoria(Equipa e1, Equipa e2, LocalDate data, LocalTime hora,
                                       Estadio estadio, Fase fase, double preco) {
         if (fase == Fase.GRUPOS) throw new IllegalArgumentException("Use o calendário para jogos da fase de grupos.");
+        Campeonato c = ds.getCampeonato();
+        if (c == null || !c.getFasesEliminatorias().contains(fase))
+            throw new IllegalArgumentException("A fase " + fase
+                    + " não existe neste campeonato (" + (c == null ? "campeonato não configurado"
+                    : c.getNumGrupos() + " grupos") + ").");
         if (e1 == e2) throw new IllegalArgumentException("As equipas têm de ser diferentes.");
         boolean conflito = ds.getJogos().stream().anyMatch(x -> x.getEstadio() == estadio && data.equals(x.getData()));
         if (conflito) throw new IllegalStateException("Conflito: o estádio já tem um jogo nesse dia.");
-        ds.getJogos().add(new Jogo(e1, e2, data, hora, estadio, fase, preco));
+
+        // preferir preencher um placeholder vazio já existente dessa fase (mantém a posição correta no bracket)
+        Jogo placeholder = ds.getJogos().stream()
+                .filter(j -> j.getFase() == fase && j.getEquipa1() == null && j.getEquipa2() == null)
+                .findFirst().orElse(null);
+        if (placeholder != null) {
+            placeholder.setEquipa1(e1);
+            placeholder.setEquipa2(e2);
+            placeholder.setData(data);
+            placeholder.setHora(hora);
+            placeholder.setEstadio(estadio);
+            placeholder.setPrecoBase(preco);
+        } else {
+            ds.getJogos().add(new Jogo(e1, e2, data, hora, estadio, fase, preco));
+        }
     }
 }

@@ -18,8 +18,7 @@ public class CriarJogoPanel extends JPanel implements JogosPanel.Atualizavel {
     private final JTextField txtData = new JTextField("01-07-2026", 10);
     private final JTextField txtHora = new JTextField("20:00", 6);
     private final JComboBox<Estadio> cmbEstadio = new JComboBox<>();
-    private final JComboBox<Fase> cmbFase = new JComboBox<>(
-            new Fase[]{ Fase.OITAVOS, Fase.QUARTOS, Fase.MEIAS, Fase.FINAL });
+    private final JComboBox<Fase> cmbFase = new JComboBox<>();
     private final JTextField txtPreco = new JTextField("75", 6);
 
     public CriarJogoPanel() {
@@ -64,5 +63,11 @@ public class CriarJogoPanel extends JPanel implements JogosPanel.Atualizavel {
         cmbE1.removeAllItems(); cmbE2.removeAllItems(); cmbEstadio.removeAllItems();
         for (Equipa e : DataStore.getInstance().getEquipas()) { cmbE1.addItem(e); cmbE2.addItem(e); }
         for (Estadio s : DataStore.getInstance().getEstadios()) cmbEstadio.addItem(s);
+
+        // só mostra as fases eliminatórias que realmente existem neste campeonato
+        // (com 4 grupos não há Oitavos; só com 8 grupos)
+        cmbFase.removeAllItems();
+        Campeonato c = DataStore.getInstance().getCampeonato();
+        if (c != null) for (Fase f : c.getFasesEliminatorias()) cmbFase.addItem(f);
     }
 }
