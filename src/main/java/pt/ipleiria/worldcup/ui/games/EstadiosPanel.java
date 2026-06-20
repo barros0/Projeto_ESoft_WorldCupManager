@@ -29,7 +29,7 @@ public class EstadiosPanel extends JPanel implements JogosPanel.Atualizavel {
         btnFoto.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-                txtFoto.setText(fc.getSelectedFile().getAbsolutePath());
+                txtFoto.setText(Ui.copiarParaPastaImagens(fc.getSelectedFile()));
         });
 
         JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -99,7 +99,7 @@ public class EstadiosPanel extends JPanel implements JogosPanel.Atualizavel {
         if (row < 0) { Ui.erro(this, "Selecione um estádio na tabela."); return; }
         JFileChooser fc = new JFileChooser();
         if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            DataStore.getInstance().getEstadios().get(row).setFoto(fc.getSelectedFile().getAbsolutePath());
+            DataStore.getInstance().getEstadios().get(row).setFoto(Ui.copiarParaPastaImagens(fc.getSelectedFile()));
             atualizar();
             Ui.info(this, "Foto do estádio atualizada.");
         }

@@ -47,7 +47,7 @@ public class RegistoEquipasPanel extends JPanel implements JogosPanel.Atualizave
             fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
                     "Imagens (png, jpg, gif)", "png", "jpg", "jpeg", "gif"));
             if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                txtBandeira.setText(fc.getSelectedFile().getAbsolutePath());
+                txtBandeira.setText(Ui.copiarParaPastaImagens(fc.getSelectedFile()));
                 lblPreview.setIcon(Ui.imagem(txtBandeira.getText(), 32, 20));
             }
         });
@@ -113,7 +113,7 @@ public class RegistoEquipasPanel extends JPanel implements JogosPanel.Atualizave
             fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
                     "Imagens (png, jpg, gif)", "png", "jpg", "jpeg", "gif"));
             if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                fBandeira.setText(fc.getSelectedFile().getAbsolutePath());
+                fBandeira.setText(Ui.copiarParaPastaImagens(fc.getSelectedFile()));
                 fPreview.setIcon(Ui.imagem(fBandeira.getText(), 32, 20));
             }
         });

@@ -95,6 +95,28 @@ public final class Ui {
     }
 
     /** Carrega e redimensiona uma imagem do disco; devolve null se o caminho for inválido. */
+    /**
+     * Copia a imagem escolhida pelo utilizador para a pasta "imagens/" dentro
+     * do projeto (criando-a se necessário) e devolve o caminho RELATIVO a
+     * guardar no modelo. Assim a imagem viaja junto com o projeto (e com o
+     * .dat de dados) em qualquer máquina — em vez de um caminho absoluto que
+     * só existe no computador de quem escolheu o ficheiro.
+     * Em caso de erro de cópia, devolve o caminho absoluto original como
+     * último recurso (a imagem pelo menos continua a aparecer nessa máquina).
+     */
+    public static String copiarParaPastaImagens(java.io.File origem) {
+        try {
+            java.io.File pasta = new java.io.File("imagens");
+            pasta.mkdirs();
+            String nomeUnico = System.currentTimeMillis() + "_" + origem.getName();
+            java.io.File destino = new java.io.File(pasta, nomeUnico);
+            java.nio.file.Files.copy(origem.toPath(), destino.toPath());
+            return "imagens/" + nomeUnico;
+        } catch (Exception e) {
+            return origem.getAbsolutePath();
+        }
+    }
+
     public static ImageIcon imagem(String caminho, int w, int h) {
         if (caminho == null || caminho.isBlank()) return null;
         java.io.File f = new java.io.File(caminho);
