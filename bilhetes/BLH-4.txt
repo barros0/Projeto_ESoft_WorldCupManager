@@ -1,0 +1,10 @@
+============ BILHETE ============
+Código:    BLH-4
+Comprador: José Miguel
+Jogo:      Portugal vs Cabo Verde — Fase de Grupos — 02-07-2026
+Data:      2026-07-02  14:00
+Estádio:   Estádio de Toronto
+Setor:     B
+Qtd:       2
+Total:     160,00 €
+=================================
