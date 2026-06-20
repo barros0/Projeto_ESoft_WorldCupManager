@@ -10,7 +10,8 @@ public class JogosPanel extends JTabbedPane {
         addTab("Equipas", new RegistoEquipasPanel());
         addTab("Sorteio", new SorteioPanel());
         addTab("Calendário", new CalendarioPanel());
-        addTab("Classificação", new ClassificacaoPanel());
+        addTab("Classificação Grupos", new ClassificacaoPanel());
+        addTab("Eliminatórias", new pt.ipleiria.worldcup.ui.guest.GuestPanel.EliminatoriasView());
         addTab("Criar Jogo", new CriarJogoPanel());
         addTab("Resultados", new RegistarResultadoPanel());
         addTab("Eventos", new EventosPanel());
