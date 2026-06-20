@@ -35,6 +35,14 @@ public class MainFrame extends JFrame {
 
         tabs.addTab("🌍 Área Pública", new GuestPanel()); // acessível a todos
 
+        // Ao trocar de módulo principal (Bilheteira/Jogos/Equipas/Doping/Guest),
+        // força a atualização desse módulo — garante que dados alterados noutro
+        // separador (ex.: novo jogo criado) já aparecem sem precisar de refresh manual.
+        tabs.addChangeListener(e -> {
+            Component selecionado = tabs.getSelectedComponent();
+            atualizarRecursivamente(selecionado);
+        });
+
         JPanel top = new JPanel(new BorderLayout());
         top.setBackground(Ui.DARK);
         top.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 12));
@@ -82,5 +90,25 @@ public class MainFrame extends JFrame {
         g.fillRect(5, 1, 6, 2);
         g.dispose();
         return new ImageIcon(img);
+    }
+
+    /**
+     * Atualiza um componente: se tiver um método atualizar() (de qualquer uma
+     * das interfaces Atualizavel definidas em cada módulo), invoca-o por
+     * reflexão; se for um JTabbedPane, desce recursivamente a TODAS as
+     * sub-tabs (não só a visível), para que dados alterados noutro módulo
+     * cheguem mesmo a separadores que o utilizador ainda não voltou a clicar.
+     */
+    private void atualizarRecursivamente(Component c) {
+        try {
+            c.getClass().getMethod("atualizar").invoke(c);
+        } catch (Exception ignored) {
+            // o componente não tem método atualizar() — normal para a maioria
+        }
+        if (c instanceof JTabbedPane tp) {
+            for (int i = 0; i < tp.getTabCount(); i++) {
+                atualizarRecursivamente(tp.getComponentAt(i));
+            }
+        }
     }
 }

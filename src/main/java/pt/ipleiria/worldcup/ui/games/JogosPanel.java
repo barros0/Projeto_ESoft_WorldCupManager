@@ -1,6 +1,7 @@
 package pt.ipleiria.worldcup.ui.games;
 
 import javax.swing.*;
+import java.awt.Component;
 
 public class JogosPanel extends JTabbedPane {
     public interface Atualizavel { void atualizar(); }
@@ -19,9 +20,19 @@ public class JogosPanel extends JTabbedPane {
         addTab("Árbitros", new ArbitrosPanel());
         addTab("Arbitragem", new EquipaArbitragemPanel());
         addTab("Estádios", new EstadiosPanel());
-        addChangeListener(e -> {
-            var c = getSelectedComponent();
+        addChangeListener(e -> atualizarTodas());
+    }
+
+    /**
+     * Atualiza TODAS as tabs, não apenas a selecionada.
+     * Necessário porque ações numa tab (ex.: criar jogo) podem afetar
+     * o conteúdo de outras tabs (ex.: Eliminatórias, Classificação) mesmo
+     * que estas não estejam visíveis no momento.
+     */
+    private void atualizarTodas() {
+        for (int i = 0; i < getTabCount(); i++) {
+            Component c = getComponentAt(i);
             if (c instanceof Atualizavel a) a.atualizar();
-        });
+        }
     }
 }
