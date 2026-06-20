@@ -22,6 +22,7 @@ public class GuestPanel extends JTabbedPane {
 
     public GuestPanel() {
         addTab("Torneio", new TorneioView());
+        addTab("Eliminatórias", new EliminatoriasView());
         addTab("Equipas", new EquipasView());
         addTab("Jogos", new JogosView());
         addTab("Estádios", new EstadiosView());
@@ -358,4 +359,110 @@ public class GuestPanel extends JTabbedPane {
             modelo.addRow(new Object[]{"Total de árbitros registados", stats.totalArbitros()});
         }
     }
+
+    // ------------------------------------------------------------------
+    /** Chave de eliminatórias: bracket com placeholder por fase. */
+    public static class EliminatoriasView extends JPanel implements Atualizavel {
+        private final DataStore ds = DataStore.getInstance();
+        private final JPanel conteudo = new JPanel();
+
+        public EliminatoriasView() {
+            setLayout(new BorderLayout());
+            setBackground(Ui.LIGHT);
+            add(Ui.title("Eliminatórias"), BorderLayout.NORTH);
+            conteudo.setOpaque(false);
+            add(new JScrollPane(conteudo), BorderLayout.CENTER);
+            atualizar();
+        }
+
+        @Override public void atualizar() {
+            conteudo.removeAll();
+            Campeonato c = ds.getCampeonato();
+            if (c == null) {
+                conteudo.setLayout(new FlowLayout());
+                conteudo.add(new JLabel("Campeonato ainda não configurado."));
+                conteudo.revalidate(); conteudo.repaint();
+                return;
+            }
+
+            java.util.List<Fase> fases = c.getFasesEliminatorias();
+            conteudo.setLayout(new GridLayout(1, fases.size(), 16, 0));
+            conteudo.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+
+            for (Fase fase : fases) {
+                // jogos desta fase
+                java.util.List<Jogo> jogos = ds.getJogos().stream()
+                        .filter(j -> j.getFase() == fase)
+                        .toList();
+
+                int nJogos = switch (fase) {
+                    case OITAVOS -> 8; case QUARTOS -> 4;
+                    case MEIAS   -> 2; case FINAL   -> 1;
+                    default -> 0;
+                };
+
+                JPanel col = new JPanel();
+                col.setOpaque(false);
+                col.setLayout(new BoxLayout(col, BoxLayout.Y_AXIS));
+                JLabel titulo = new JLabel(fase.toString(), SwingConstants.CENTER);
+                titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 13f));
+                titulo.setForeground(Ui.PRIMARY);
+                titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+                titulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+                col.add(titulo);
+
+                for (int i = 0; i < nJogos; i++) {
+                    Jogo j = i < jogos.size() ? jogos.get(i) : null;
+                    col.add(cartaoJogo(j));
+                    col.add(Box.createVerticalStrut(6));
+                }
+                conteudo.add(col);
+            }
+            conteudo.revalidate();
+            conteudo.repaint();
+        }
+
+        private JPanel cartaoJogo(Jogo j) {
+            JPanel p = new JPanel(new GridLayout(3, 1, 0, 2));
+            p.setBackground(Color.WHITE);
+            p.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Ui.BORDER, 1, true),
+                    BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+            p.setMaximumSize(new Dimension(200, 72));
+
+            if (j == null || j.getEquipa1() == null) {
+                // placeholder
+                p.setBackground(new Color(248, 250, 252));
+                p.add(equipaLabel(null, "A definir"));
+                JLabel vs = new JLabel("vs", SwingConstants.CENTER);
+                vs.setForeground(Ui.MUTED);
+                vs.setFont(vs.getFont().deriveFont(Font.ITALIC, 11f));
+                p.add(vs);
+                p.add(equipaLabel(null, "A definir"));
+            } else {
+                p.add(equipaLabel(j.getEquipa1().getBandeira(), j.getEquipa1().getPais()
+                        + (j.isRealizado() ? "  " + j.getGolos1() : "")));
+                JLabel vs = new JLabel(j.isRealizado()
+                        ? (j.getData() != null ? Ui.fmt(j.getData()) : "")
+                        : (j.getData() != null ? Ui.fmt(j.getData()) : "vs"), SwingConstants.CENTER);
+                vs.setForeground(Ui.MUTED);
+                vs.setFont(vs.getFont().deriveFont(11f));
+                p.add(vs);
+                p.add(equipaLabel(j.getEquipa2() == null ? null : j.getEquipa2().getBandeira(),
+                        j.getEquipa2() == null ? "A definir"
+                        : j.getEquipa2().getPais() + (j.isRealizado() ? "  " + j.getGolos2() : "")));
+            }
+            return p;
+        }
+
+        private JLabel equipaLabel(String bandeira, String nome) {
+            JLabel l = new JLabel(nome);
+            l.setFont(l.getFont().deriveFont(12f));
+            l.setForeground(Ui.INK);
+            ImageIcon ic = Ui.imagem(bandeira, 24, 15);
+            if (ic != null) { l.setIcon(ic); l.setIconTextGap(6); }
+            return l;
+        }
+    }
+
 }
