@@ -11,10 +11,12 @@ public class BilheteService {
 
     private final DataStore ds = DataStore.getInstance();
 
-    /** Regista a venda: valida lugares, gera código único e gera o ficheiro do bilhete. */
+    /** Regista a venda: valida que o jogo é futuro, valida lugares, gera código único e ficheiro do bilhete. */
     public Bilhete venderBilhete(String comprador, Jogo jogo, Setor setor, int quantidade) {
         if (comprador == null || comprador.isBlank())
             throw new IllegalArgumentException("Indique o nome do comprador.");
+        if (jogo.isRealizado())
+            throw new IllegalStateException("Não é possível vender bilhetes para um jogo já realizado.");
         if (quantidade < 1) throw new IllegalArgumentException("Quantidade inválida.");
         int disponiveis = jogo.lugaresDisponiveis(setor);
         if (quantidade > disponiveis)

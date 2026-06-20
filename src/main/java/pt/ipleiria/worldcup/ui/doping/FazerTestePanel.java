@@ -72,9 +72,8 @@ public class FazerTestePanel extends JPanel implements DopingPanel.Atualizavel {
         // data automática
         data.setText(j.getData() != null ? Ui.fmt(j.getData()) : "");
 
-        // contar testes já feitos para esta data
-        long feitos = j.getData() == null ? 0 : ds.getTestes().stream()
-                .filter(t -> t.getData().equals(j.getData())).count();
+        // contar testes já feitos para ESTE JOGO (não para a data — pode haver +1 jogo no mesmo dia)
+        long feitos = ds.getTestes().stream().filter(t -> t.getJogo() == j).count();
         lblTestesFeitos.setText("Testes neste jogo: " + feitos + " / 2"
                 + (feitos >= 2 ? "  ⚠ limite atingido" : ""));
         lblTestesFeitos.setForeground(feitos >= 2 ? Color.RED : Ui.MUTED);
@@ -90,12 +89,11 @@ public class FazerTestePanel extends JPanel implements DopingPanel.Atualizavel {
         try {
             Object sel = jogo.getSelectedItem();
             if (!(sel instanceof Jogo j)) throw new IllegalArgumentException("Selecione o jogo.");
-            if (j.getData() == null) throw new IllegalArgumentException("O jogo selecionado não tem data definida.");
             Jogador jog = (Jogador) jogador.getSelectedItem();
             if (jog == null) throw new IllegalArgumentException("Selecione o jogador testado.");
             ResultadoTeste r = (ResultadoTeste) resultado.getSelectedItem();
             Substancia s = r == ResultadoTeste.POSITIVO ? (Substancia) substancia.getSelectedItem() : null;
-            TesteDoping t = service.registarTeste(jog, j.getData(), r, s);
+            TesteDoping t = service.registarTeste(jog, j, r, s);
             aoSelecionarJogo(); // atualiza contador
             String msg = "Teste registado com sucesso.";
             if (!"-".equals(t.getCastigoAplicado()))
